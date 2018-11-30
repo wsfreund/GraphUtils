@@ -15,22 +15,22 @@ function adaptativeDateTicks(axesH,plotOpts,option,method)
 % axis display. They need to be arranged as a matrix as they are
 % displayed on the screen.
 %
-%   -> plotOpts <Options.PlotOpts default object> (PlotOpts object): 
+%   -> plotOpts <Options.PlotOpts default object> (PlotOpts object):
 %  The options used as fontSize and number of ticks.
 %
 %   -> option (boolean): whether to turn on or off the
-%  adaptativeDateTicks. 
-% 
-%   -> method 
+%  adaptativeDateTicks.
+%
+%   -> method
 %     o 'fullDate': show full date.
 %     o 'distFromCenter': show time distance from center.
 %
 
 
 % - Creation Date: Thu, 05 Sep 2013
-% - Last Modified: Sun, 10 Aug 2014
-% - Author(s): 
-%   - W.S.Freund <wsfreund_at_gmail_dot_com> 
+% - Last Modified: Mon, 16 Jul 2018
+% - Author(s):
+%   - W.S.Freund <wsfreund_at_gmail_dot_com>
 
 if nargin < 4
   method = 'fullDate';
@@ -59,7 +59,7 @@ if option
     for axesColumn=nColumns:-1:1
       curAxes = axesH(axesLine,axesColumn);
       if axesLine~=nLines
-        if ~feature('UseHG2') 
+        if verLessThan('matlab','8.4.0')
           hhAxes = handle(curAxes);  % hAxes is the Matlab handle of our
           % axes
           hProp = findprop(hhAxes,'XLim');  % a schema.prop object
@@ -74,7 +74,7 @@ if option
           setappdata(curAxes,'xTickListener',xTickListener);
         end
       else
-        if ~feature('UseHG2')
+        if verLessThan('matlab','8.4.0')
           hhAxes = handle(curAxes);  % hAxes is the Matlab handle of our
           % axes
           hProp = findprop(hhAxes,'XLim');  % a schema.prop object
@@ -176,7 +176,7 @@ function changeXLabelsAndTitle(hAxes,fontSize,nTicks)
   % Create the new format of the labels
   xTicks = linspace(lim(1),lim(2),nTicks);
   % Create the new format of the labels
-  if tDiff<(nTicks+1)/86400 % If elapsed time is lower than nTicks+1 
+  if tDiff<(nTicks+1)/86400 % If elapsed time is lower than nTicks+1
     % seconds:
     nTicks = nTicks-2;
     if nTicks<2

@@ -16,8 +16,8 @@ function textH = addNilmFilesBorder(handles,fileStartStamps,...
 %
 
 % - Creation Date: Thu, 05 Sep 2013
-% - Last Modified: Sun, 10 Aug 2014
-% - Author(s): 
+% - Last Modified: Mon, 16 Jul 2018
+% - Author(s):
 %   - W.S.Freund <wsfreund_at_gmail_dot_com>
 
   nPlots = size(handles,1);
@@ -48,7 +48,7 @@ function textH = addNilmFilesBorder(handles,fileStartStamps,...
         set(get(get(startFileBorder(k,m,curFile),'Annotation'),'LegendInformation'),...
             'IconDisplayStyle','off'); % Exclude handle from legend
         set(handles(k,m),'YLim',yl);
-        endFileBorder(k,m,curFile) = plot(handles(k,m),[fileEndStamps(curFile)... 
+        endFileBorder(k,m,curFile) = plot(handles(k,m),[fileEndStamps(curFile)...
           fileEndStamps(curFile)],[yl(1) yl(2)],'Color',[.7 .7 .7],...
           'UserData',sprintf('End of NilmFile %d',curFile),...
           'HitTest','off');
@@ -71,7 +71,7 @@ function textH = addNilmFilesBorder(handles,fileStartStamps,...
       xTickH = findprop(handle(handles(k,m)),'XTick');
       yTickH = findprop(handle(handles(k,m)),'YTick');
       if k==1
-        if feature('UseHG2')
+        if ~verLessThan('matlab','8.4.0')
           hListenerX = addlistener(handles(k,m),'XTick',...
             'PostSet', @(a,b) textUpdate(a,b,textH));
           hListenerY = addlistener(handles(k,m),'YTick',...
@@ -82,7 +82,7 @@ function textH = addNilmFilesBorder(handles,fileStartStamps,...
           hListenerY = handle.listener(handles(k,m),yTickH,...
             'PropertyPostSet', @(a,b) textUpdate(a,b,textH));
         end
-        if ~feature('UseHG2')
+        if verLessThan('matlab','8.4.0')
           isTooClose(textH);
         end
       end
@@ -98,7 +98,7 @@ function textH = addNilmFilesBorder(handles,fileStartStamps,...
       set(endFileBorder(k,m,:),'Parent',fileBorderGroup);
       % Include these hggroups in the legend:
       set(get(get(fileBorderGroup,'Annotation'),'LegendInformation'),...
-        'IconDisplayStyle','off'); 
+        'IconDisplayStyle','off');
       uistack(fileBorderGroup,'bottom');
     end
   end
@@ -118,7 +118,7 @@ function textUpdate(~,eventData,textH)
   end
   set(textH(~inside),'Visible','off');
   set(textH(inside),'Visible','on');
-  if ~feature('UseHG2')
+  if verLessThan('matlab','8.4.0')
     isTooClose(textH(inside));
   end
 end

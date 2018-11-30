@@ -24,10 +24,10 @@ classdef NewZoomAndPan < handle
 %
 % getappdata(figH,'newZAP');
 %
-%    Known bugs: 
+%    Known bugs:
 %   1 - After pushing alt-tab and holding a key for a while,
 % the newZAP may get unresponsive. If that happens, just push alt-tab
-% twice again and the figure will respond as expected. 
+% twice again and the figure will respond as expected.
 % More details at:
 %
 % http://stackoverflow.com/questions/18651177/windowkeypress-a-k-a-windowkeypressevent-and-keypressfcn-doesnt-trigger-afte
@@ -50,9 +50,9 @@ classdef NewZoomAndPan < handle
 
 
 % - Creation Date: Thu, 05 Sep 2013
-% - Last Modified: Sun, 28 Sep 2014
-% - Author(s): 
-%   - W.S.Freund <wsfreund_at_gmail_dot_com> 
+% - Last Modified: Mon, 16 Jul 2018
+% - Author(s):
+%   - W.S.Freund <wsfreund_at_gmail_dot_com>
 
 % TODO: Add a rectangle in the middle of the figure showing the
 % pressed action. This should be configurable and possible to use the
@@ -129,7 +129,7 @@ classdef NewZoomAndPan < handle
       %
       % http://undocumentedmatlab.com/blog/inactive-control-tooltips-event-chaining/
       %
-      
+
       %if ~usejava('awt') || ~usejava('jvm')
       %  self.nojava = true;
       %  Output.WARNING(['NILM_CEPEL:GraphUtils:newZoomAndPanListener:'...
@@ -178,8 +178,8 @@ classdef NewZoomAndPan < handle
 
         self.lastAxesListener = addlistener(self,'curAxes','PostSet',...
           @self.updateLastAxes);
-        
-        if feature('UseHG2')
+
+        if ~verLessThan('matlab','8.4.0')
           self.pressListener=addlistener(self.figH,'WindowKeyPress',...
             @(a,b) self.keyPressNewZoomAndPan(a,b));
           self.releaseListener=addlistener(self.figH,'WindowKeyRelease',...
@@ -213,7 +213,7 @@ classdef NewZoomAndPan < handle
               self.oldAxisLimits{thisLine,thisColumn} = [];
               self.overAllLimits{thisLine,thisColumn} = [];
             end
-            %if feature('UseHG2')
+            %if ~verLessThan('matlab','8.4.0')
             %  self.hListenerX(k) = addlistener(self.curAxes,'XTick',...
             %    'PostSet', @updateOverAllLimits);
             %  self.hListenerY(k) = addlistener(self.curAxes,'YTick',...
@@ -242,7 +242,7 @@ classdef NewZoomAndPan < handle
         end
         try
           if isvalid(self)
-            if feature('UseHG2')
+            if ~verLessThan('matlab','8.4.0')
               GraphUtils.deleteHandle(self.pressListener)
               GraphUtils.deleteHandle(self.releaseListener)
             end
@@ -267,7 +267,7 @@ classdef NewZoomAndPan < handle
         end
         try
           if isvalid(self)
-            if feature('UseHG2')
+            if ~verLessThan('matlab','8.4.0')
               self.pressListener.Enabled = true;
               self.releaseListener.Enabled = true;
               self.lastAxesListener.Enabled = true;
@@ -293,7 +293,7 @@ classdef NewZoomAndPan < handle
         end
         try
           if isvalid(self)
-            if feature('UseHG2')
+            if ~verLessThan('matlab','8.4.0')
               self.pressListener.Enabled = false;
               self.releaseListener.Enabled = false;
               self.lastAxesListener.Enabled = false;
@@ -363,7 +363,7 @@ classdef NewZoomAndPan < handle
     % Actions taken when key are pressed.
     %
     % -> figH (figure handle): the figure handle.
-    % 
+    %
     % -> keyInfo (event handle): Event information from the pressed key.
     % It has the following properties:
     %
@@ -387,7 +387,7 @@ classdef NewZoomAndPan < handle
       self.processedPressCallback = false;
       self.isValidClickIn = false;
 
-      if feature('UseHG2')
+      if ~verLessThan('matlab','8.4.0')
         mChar = keyInfo.Character;
       else
         mChar = keyInfo.Source.CurrentCharacter;
@@ -417,12 +417,12 @@ classdef NewZoomAndPan < handle
             self.oldAxisLimits{axesLine,axesColumn} = oldLimits;
             figPosition = GraphUtils.getFigLimits(self.figH);
             overAll = self.overAllLimits{axesLine,axesColumn};
-            if feature('UseHG2')
+            if ~verLessThan('matlab','8.4.0')
               self.pressListener.Enabled = false;
             else
               self.pressListener.Enabled = 'off';
             end
-            if feature('UseHG2')
+            if ~verLessThan('matlab','8.4.0')
               self.panListener = addlistener(self.figH,...
                 'WindowMouseMotion',@(a,b) newPan);
             else
@@ -435,7 +435,7 @@ classdef NewZoomAndPan < handle
         end
       case 'z' % Use z to zoom on axes
         if ~self.keyPressed
-          if feature('UseHG2')
+          if ~verLessThan('matlab','8.4.0')
             self.pressListener.Enabled = false;
           else
             self.pressListener.Enabled = 'off';
@@ -466,7 +466,7 @@ classdef NewZoomAndPan < handle
               'HandleVisibility','off','HitTest','off');
             set(get(get(self.zoomPatchH,'Annotation'),'LegendInformation'),...
                 'IconDisplayStyle','off'); % Exclude handle from legend
-            if feature('UseHG2')
+            if ~verLessThan('matlab','8.4.0')
               self.zoomPatchH.FaceAlpha = .3;
               self.zoomPatchH.FaceColor = [.7 .7 .7];
               self.zoomListener = addlistener(self.figH,...
@@ -480,12 +480,12 @@ classdef NewZoomAndPan < handle
           end
         end
       end
-      
+
       self.processedPressCallback = true;
 
       function newPan
       %
-      % newPan will change axes position 
+      % newPan will change axes position
       %
 
         if GraphUtils.isMultipleCallback
@@ -586,8 +586,8 @@ classdef NewZoomAndPan < handle
     function keyReleaseNewZoomAndPan(self,~,keyInfo)
     %
     % Actions taken when key are released.
-    % 
-      
+    %
+
       %selType = get(gco,'Type');
 
       %if ~isempty(gco) && ~any(strcmp(selType,{'axes','figure'}))
@@ -601,7 +601,7 @@ classdef NewZoomAndPan < handle
       %end
 
 
-      if feature('UseHG2')
+      if ~verLessThan('matlab','8.4.0')
         mChar = keyInfo.Character;
       else
         mChar = keyInfo.Source.CurrentCharacter;
@@ -611,7 +611,7 @@ classdef NewZoomAndPan < handle
 
       switch mChar
       case ' '
-        if feature('UseHG2')
+        if ~verLessThan('matlab','8.4.0')
           self.pressListener.Enabled = true;
         else
           self.pressListener.Enabled = 'on';
@@ -622,7 +622,7 @@ classdef NewZoomAndPan < handle
         GraphUtils.deleteHandle(self.panListener);
         self.panListener=[];
       case 'z'
-        if feature('UseHG2')
+        if ~verLessThan('matlab','8.4.0')
           self.pressListener.Enabled = true;
         else
           self.pressListener.Enabled = 'on';
@@ -639,7 +639,7 @@ classdef NewZoomAndPan < handle
           return
         end
 
-        if ~isempty(self.curAxes) 
+        if ~isempty(self.curAxes)
           GraphUtils.deleteHandle(self.zoomPatchH);
           self.zoomPatchH = [];
 
